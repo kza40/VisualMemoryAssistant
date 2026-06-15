@@ -29,7 +29,7 @@ def read_jsonl( file ):
 
     return records
 
-    
+
 def load_images( metadata_file ):
     """Load images listed in the metadata JSONL file. Skips missing or unreadable paths."""
     images = []
@@ -48,7 +48,7 @@ def load_images( metadata_file ):
             if not image_path.exists():
                 print(f"Warning: image file does not exist: {image_path}")
                 continue
-            
+
             image = cv2.imread( str(image_path) )
 
             if image is None:
