@@ -6,3 +6,7 @@ __pycache__/
 *.pyc
 holder.py
 data/raw/
+data/metadata/
+data/embeddings/
+tempCodeRunnerFile.py
+.local/

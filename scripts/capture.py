@@ -1,3 +1,6 @@
+# Continuously captures frames from a webcam at a fixed interval and writes each image
+# to data/raw/ with a corresponding metadata entry in data/metadata/captures.jsonl.
+
 from pathlib import Path
 import cv2
 from datetime import datetime
@@ -6,113 +9,88 @@ import time
 
 
 
-##### configuration values
+# Edit these to configure capture behaviour
 CAMERA_ID = 0
 CAPTURE_INTERVAL_SECONDS = 10
+MAX_CAPTURES = 5  # set higher (or remove the limit) for real use
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 RAW_IMAGE_FOLDER = BASE_DIR / "data" / "raw"
 METADATA_FOLDER = BASE_DIR / "data" / "metadata"
-METADATA_FILE = METADATA_FOLDER / "captures.jsonl"  # JSONL = JSON Lines format
+METADATA_FILE = METADATA_FOLDER / "captures.jsonl"
 IMAGE_PREFIX = "frame"
-MAX_CAPTURES = 5 # for testing
+
 
 def create_directories():
-    """
-    Create the folders we need if they do not already exist.
-    """
-    RAW_IMAGE_FOLDER.mkdir( parents = True, exist_ok = True)
-    METADATA_FOLDER.mkdir( parents = True, exist_ok = True)
-    
+    """Create output directories if they don't exist."""
+    RAW_IMAGE_FOLDER.mkdir(parents=True, exist_ok=True)
+    METADATA_FOLDER.mkdir(parents=True, exist_ok=True)
+
 
 def open_camera( camera_id: int ):
-    """
-    Open the webcam and return the camera object.
-    Raise an error if the camera cannot be opened.
-    """
-    camera = cv2.VideoCapture( camera_id )
-
+    """Open the webcam and return the capture object, or raise if unavailable."""
+    camera = cv2.VideoCapture(camera_id)
     if not camera.isOpened():
         raise RuntimeError(f"Could not open camera with CAMERA_ID = {camera_id}")
-    
     return camera
 
-def generate_timestamps():
-    """
-    Return two timestamp formats:
-    1. A filename-safe timestamp for image names
-    2. An ISO timestamp for metadata logging
-    """
-    now = datetime.now()
-    filename_timestamp = now.strftime("%Y%m%d_%H%M%S")
-    iso_timestamp = now.isoformat()
 
-    return filename_timestamp, iso_timestamp
+def generate_timestamps():
+    """Return (filename_safe_timestamp, iso_timestamp) for the current moment."""
+    now = datetime.now()
+    return now.strftime("%Y%m%d_%H%M%S"), now.isoformat()
+
 
 def save_frame( frame, filename_timestamp ):
-    """
-    Save the captured frame to disk and return the file path.
-    Raise an error if saving fails.
-    """
+    """Write a frame to data/raw/ and return its path."""
     filename = f"{IMAGE_PREFIX}_{filename_timestamp}.jpg"
     image_path = RAW_IMAGE_FOLDER / filename
-
-    success = cv2.imwrite( str(image_path), frame )
-
-    if not success:
+    if not cv2.imwrite(str(image_path), frame):
         raise RuntimeError(f"Failed to save image to {image_path}")
-
     return image_path
-    
+
+
 def append_metadata( image_path, iso_timestamp ):
-    """
-    Append one metadata record to a JSONL file.
-    Each line is a separate JSON object.
-    """
+    """Append a single JSON record to the JSONL metadata file."""
     record = {
         "timestamp": iso_timestamp,
         "image_path": str(image_path),
         "file_name": image_path.name,
         "status": "captured",
     }
+    with open(METADATA_FILE, "a", encoding="utf-8") as file:
+        file.write(json.dumps(record) + "\n")
 
-    with open( METADATA_FILE, "a", encoding = "utf-8" ) as file:
-        file.write( json.dumps( record ) + "\n" )
 
+def capture_frame(camera, interval_seconds):
+    """Capture one frame, persist it, then sleep for the configured interval."""
+    success, frame = camera.read()
 
-def capture_loop( camera, interval_seconds, camera_id ):
-    """
-    Repeatedly capture frames from the camera at the specified interval.
-    """
+    if not success:
+        print("Warning: Failed to capture frame. Skipping.")
+        return
 
-    while True:
-        success, frame = camera.read()
+    filename_timestamp, iso_timestamp = generate_timestamps()
 
-        if not success:
-            print("Warning: Failed to capture frame. Retrying in 2 seconds...")
-            time.sleep(2)
-            continue
-        
-        filename_timestamp, iso_timestamp = generate_timestamps()
+    try:
+        image_path = save_frame(frame, filename_timestamp)
+        append_metadata(image_path, iso_timestamp)
+        print(f"\nSaved image: {image_path} at {iso_timestamp}")
 
-        try:
-            image_path = save_frame( frame, filename_timestamp )
-            append_metadata( image_path, iso_timestamp )
-            print(f"\nSaved image: {image_path} at {iso_timestamp}")
+    except Exception as error:
+        print(f"Warning: {error}")
 
-        except Exception as error:
-            print(f"Warning: {error}")
+    time.sleep(interval_seconds)
 
-        time.sleep( interval_seconds )
-        
 
 def main():
 
     create_directories()
-    camera = open_camera( CAMERA_ID )
+    camera = open_camera(CAMERA_ID)
 
     try:
-        for _ in range( MAX_CAPTURES ):
-            capture_loop( camera, CAPTURE_INTERVAL_SECONDS, CAMERA_ID )
+        for _ in range(MAX_CAPTURES):
+            capture_frame(camera, CAPTURE_INTERVAL_SECONDS)
 
     except KeyboardInterrupt:
         print("\nCapture stopped by user.")
