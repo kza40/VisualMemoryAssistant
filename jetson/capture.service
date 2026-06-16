@@ -1,0 +1,27 @@
+# systemd unit for the Visual Memory Assistant capture loop.
+# Starts automatically on boot and restarts on failure.
+#
+# Install:
+#   1. Edit the paths below to match your deployment location
+#   2. sudo cp jetson/capture.service /etc/systemd/system/capture.service
+#   3. sudo systemctl daemon-reload
+#   4. sudo systemctl enable capture
+#   5. sudo systemctl start capture
+#
+# Check status:  sudo systemctl status capture
+# View logs:     journalctl -u capture -f
+
+[Unit]
+Description=Visual Memory Assistant — capture loop
+After=network.target
+
+[Service]
+ExecStart=/path/to/venv/bin/python /path/to/VirtualMemoryAssistant/main.py capture
+WorkingDirectory=/path/to/VirtualMemoryAssistant
+Restart=always
+RestartSec=5
+# Run as a non-root user where possible
+# User=your-username
+
+[Install]
+WantedBy=multi-user.target

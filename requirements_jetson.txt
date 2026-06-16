@@ -1,0 +1,18 @@
+# Jetson Orin Nano dependencies for the Visual Memory Assistant.
+#
+# IMPORTANT: torch must be installed FIRST from NVIDIA's JetPack-specific wheel —
+# the PyPI torch package does not support Jetson's ARM/CUDA architecture.
+#
+# Step 1 — install the JetPack torch wheel (check NVIDIA docs for the exact URL
+#           matching your JetPack version):
+#   pip install https://developer.download.nvidia.com/compute/redist/jp/v61/pytorch/torch-2.x.0+nv24.x-cp310-cp310-linux_aarch64.whl
+#
+# Step 2 — install everything else:
+#   pip install -r requirements_jetson.txt
+
+opencv-python
+Pillow
+transformers
+numpy
+faiss-cpu   # swap for faiss-gpu if you want GPU-accelerated index search
+pytest

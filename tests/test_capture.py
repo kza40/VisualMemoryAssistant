@@ -8,6 +8,26 @@ import numpy as np
 import pytest
 
 
+def test_open_camera_csi_uses_gstreamer(monkeypatch):
+    from scripts import capture
+    with patch("cv2.VideoCapture") as mock_cap:
+        mock_instance = mock_cap.return_value
+        mock_instance.isOpened.return_value = True
+        capture.open_camera(0, camera_source="csi")
+        args = mock_cap.call_args[0]
+        assert "nvarguscamerasrc" in args[0]
+
+
+def test_open_camera_usb_uses_integer_id(monkeypatch):
+    from scripts import capture
+    with patch("cv2.VideoCapture") as mock_cap:
+        mock_instance = mock_cap.return_value
+        mock_instance.isOpened.return_value = True
+        capture.open_camera(0, camera_source="usb")
+        args = mock_cap.call_args[0]
+        assert args[0] == 0
+
+
 def test_create_directories_creates_folders(tmp_path, monkeypatch):
     from scripts import capture
     monkeypatch.setattr(capture, "RAW_IMAGE_FOLDER", tmp_path / "raw")

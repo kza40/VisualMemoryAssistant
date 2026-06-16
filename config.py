@@ -7,7 +7,7 @@ BASE_DIR = Path(__file__).resolve().parent
 
 # --- Camera ---
 CAMERA_ID = 0
-CAMERA_SOURCE = "usb"       # "usb" | "csi"  (csi for Jetson GStreamer pipeline)
+CAMERA_SOURCE = "usb"       # "usb" | "csi" — set to "csi" on Jetson with a CSI camera
 CAPTURE_INTERVAL_SECONDS = 10
 MAX_CAPTURES = 5            # increase (or remove cap) for real deployments
 IMAGE_PREFIX = "frame"

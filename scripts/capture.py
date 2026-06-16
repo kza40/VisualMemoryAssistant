@@ -13,7 +13,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(BASE_DIR))
 
 from config import (
-    CAMERA_ID, CAPTURE_INTERVAL_SECONDS, MAX_CAPTURES,
+    CAMERA_ID, CAMERA_SOURCE, CAPTURE_INTERVAL_SECONDS, MAX_CAPTURES,
     RAW_IMAGE_FOLDER, METADATA_FOLDER, METADATA_FILE, IMAGE_PREFIX,
 )
 
@@ -24,11 +24,24 @@ def create_directories():
     METADATA_FOLDER.mkdir(parents=True, exist_ok=True)
 
 
-def open_camera( camera_id: int ):
-    """Open the webcam and return the capture object, or raise if unavailable."""
-    camera = cv2.VideoCapture(camera_id)
+def open_camera( camera_id: int, camera_source: str = "usb" ):
+    """Open the webcam and return the capture object, or raise if unavailable.
+
+    When camera_source is "csi", uses a GStreamer pipeline for Jetson CSI cameras.
+    Falls back to standard USB capture otherwise.
+    """
+    if camera_source == "csi":
+        # GStreamer pipeline for Jetson Orin Nano CSI camera via libargus
+        gst_pipeline = (
+            "nvarguscamerasrc ! video/x-raw(memory:NVMM) ! "
+            "nvvidconv ! video/x-raw, format=BGRx ! videoconvert ! appsink"
+        )
+        camera = cv2.VideoCapture(gst_pipeline, cv2.CAP_GSTREAMER)
+    else:
+        camera = cv2.VideoCapture(camera_id)
+
     if not camera.isOpened():
-        raise RuntimeError(f"Could not open camera with CAMERA_ID = {camera_id}")
+        raise RuntimeError(f"Could not open camera (source={camera_source}, id={camera_id})")
     return camera
 
 
@@ -79,7 +92,7 @@ def capture_frame( camera, interval_seconds ):
 
 def main():
     create_directories()
-    camera = open_camera(CAMERA_ID)
+    camera = open_camera(CAMERA_ID, CAMERA_SOURCE)
     try:
         for _ in range(MAX_CAPTURES):
             capture_frame(camera, CAPTURE_INTERVAL_SECONDS)
