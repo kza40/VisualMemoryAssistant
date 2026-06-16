@@ -2,16 +2,16 @@
 # inner-product index, then saves it to data/embeddings/faiss.index for query-time search.
 
 import json
+import sys
 from pathlib import Path
-import numpy as np
-import faiss
 
+import faiss
+import numpy as np
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-EMBEDDINGS_DIR = BASE_DIR / "data" / "embeddings"
-EMBEDDINGS_FILE = EMBEDDINGS_DIR / "image_embeddings.npy"
-MAPPING_FILE = EMBEDDINGS_DIR / "image_mapping.json"
-INDEX_FILE = EMBEDDINGS_DIR / "faiss.index"
+sys.path.insert(0, str(BASE_DIR))
+
+from config import EMBEDDINGS_FILE, MAPPING_FILE, INDEX_FILE
 
 
 def load_embeddings( embeddings_file, mapping_file ):
@@ -20,12 +20,9 @@ def load_embeddings( embeddings_file, mapping_file ):
         raise FileNotFoundError(f"Embeddings file not found: {embeddings_file}")
     if not mapping_file.exists():
         raise FileNotFoundError(f"Mapping file not found: {mapping_file}")
-
     embeddings_array = np.load(str(embeddings_file)).astype("float32")
-
     with open(mapping_file, "r", encoding="utf-8") as f:
         mapping = json.load(f)
-
     print(f"Loaded {len(mapping)} embeddings with shape {embeddings_array.shape}")
     return embeddings_array, mapping
 
@@ -33,8 +30,8 @@ def load_embeddings( embeddings_file, mapping_file ):
 def build_faiss_index( embeddings_array ):
     """Build and return a FAISS IndexFlatIP populated with all embeddings.
 
-    IndexFlatIP (inner product) is equivalent to cosine similarity when vectors are L2-normalized,
-    which is the case for all CLIP outputs produced by embed_images.py.
+    IndexFlatIP (inner product) is equivalent to cosine similarity when vectors are
+    L2-normalized, which is the case for all CLIP outputs produced by embed_images.py.
     """
     dimension = embeddings_array.shape[1]
     index = faiss.IndexFlatIP(dimension)

@@ -29,7 +29,7 @@ When the user asks a question, the system finds the most relevant past image and
 | 5 | Vector database (FAISS) | Done |
 | 6 | Natural language query | Done |
 | 7 | Image retrieval | Done |
-| 8 | VLM reasoning | Pending |
+| 8 | VLM reasoning | Done |
 
 ---
 
@@ -37,15 +37,18 @@ When the user asks a question, the system finds the most relevant past image and
 
 ```
 VirtualMemoryAssistant/
+├── main.py                 # Unified CLI entry point
+├── config.py               # Central configuration (paths, constants, model IDs)
 ├── scripts/
 │   ├── capture.py          # Webcam capture loop
-│   ├── embed_images.py     # CLIP embedding pipeline
+│   ├── embed_images.py     # CLIP embedding pipeline (incremental)
 │   ├── build_index.py      # FAISS index builder
-│   └── query.py            # Natural language search
-├── utils/                  # Shared utilities (Phase 2)
-├── models/                 # VLM wrapper (Phase 3)
-├── app/                    # Query interface (coming soon)
-├── tests/                  # Test suite (coming soon)
+│   └── query.py            # Natural language search + VLM answer
+├── utils/
+│   └── clip_utils.py       # Shared CLIP model loader
+├── models/
+│   └── vlm.py              # Moondream2 VLM wrapper
+├── tests/                  # Full test suite (32 tests, all mocked)
 ├── data/
 │   ├── raw/                # Captured JPEG frames (gitignored)
 │   ├── metadata/           # Per-image metadata (gitignored)
@@ -159,18 +162,20 @@ Query: "Where is my coffee mug?"
     Path       : D:\VirtualMemoryAssistant\data\raw\frame_20260614_154210.jpg
 ```
 
-### 8. Vision-Language Reasoning — Pending
+### 8. Vision-Language Reasoning
 
-The retrieved image will be passed to a Vision-Language Model along with the user's question to generate a natural language answer.
-
-Model: **Moondream2** (`vikhyatk/moondream2`) — runs locally, CUDA-accelerated on Jetson Orin Nano.
+The top retrieved image is passed to **Moondream2** (`vikhyatk/moondream2`) along with the user's question to generate a natural language answer. The model runs locally and is CUDA-accelerated on supported hardware (Jetson Orin Nano, discrete GPU).
 
 Example:
 
 ```
-Question: Where is my coffee mug?
+Query: "Where is my coffee mug?"
+----------------------------------------
+#1  frame_20260614_154210.jpg
+    Similarity : 0.8214
+    ...
 
-Answer: The coffee mug appears to be on the desk, near the laptop and keyboard.
+Answer: The coffee mug is on the desk to the left of the keyboard.
 ```
 
 ---
