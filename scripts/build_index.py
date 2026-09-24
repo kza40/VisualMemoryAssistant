@@ -49,7 +49,7 @@ def save_index( index, index_file ):
 def load_index( index_file ):
     """Read a FAISS index from disk. Used by query.py at search time."""
     if not index_file.exists():
-        raise FileNotFoundError(f"FAISS index file not found: {index_file}")
+        raise FileNotFoundError(f"FAISS index not found: {index_file}. Run `main.py index` first.")
     return faiss.read_index(str(index_file))
 
 

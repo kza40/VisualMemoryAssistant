@@ -5,7 +5,6 @@ import json
 import sys
 from pathlib import Path
 
-import faiss
 import numpy as np
 import torch
 
@@ -13,17 +12,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(BASE_DIR))
 
 from config import INDEX_FILE, MAPPING_FILE, TOP_K
+from scripts.build_index import load_index
 from utils.clip_utils import load_clip_model
 from models.vlm import answer_question, load_moondream
 
 
 def load_resources( index_file, mapping_file ):
     """Load the FAISS index and image mapping from disk."""
-    if not index_file.exists():
-        raise FileNotFoundError(f"FAISS index not found: {index_file}. Run build_index.py first.")
     if not mapping_file.exists():
-        raise FileNotFoundError(f"Mapping file not found: {mapping_file}. Run embed_images.py first.")
-    index = faiss.read_index(str(index_file))
+        raise FileNotFoundError(f"Mapping file not found: {mapping_file}. Run `main.py embed` first.")
+    index = load_index(index_file)
     with open(mapping_file, "r", encoding="utf-8") as f:
         mapping = json.load(f)
     print(f"Loaded index with {index.ntotal} vectors")
