@@ -14,7 +14,7 @@ from config import EMBEDDINGS_DIR, EMBEDDINGS_FILE, MAPPING_FILE, METADATA_FILE
 from utils.clip_utils import load_clip_model
 
 
-def read_jsonl( file ):
+def read_jsonl(file):
     """Read a JSONL file and return records as a list of dicts."""
     records = []
     try:
@@ -25,11 +25,11 @@ def read_jsonl( file ):
                     continue
                 records.append(json.loads(line))
     except Exception as error:
-        raise RuntimeError(f"Failed to read JSON file {file}: {error}")
+        raise RuntimeError(f"Failed to read JSON file {file}: {error}") from error
     return records
 
 
-def load_images( metadata_file ):
+def load_images(metadata_file):
     """Load images listed in the metadata JSONL file. Skips missing or unreadable paths."""
     images = []
     try:
@@ -46,33 +46,37 @@ def load_images( metadata_file ):
             if image is None:
                 print(f"Warning: failed to load image: {image_path}")
                 continue
-            images.append({
-                "image": image,
-                "image_path": str(image_path),
-                "timestamp": record.get("timestamp"),
-                "file_name": record.get("file_name"),
-            })
+            images.append(
+                {
+                    "image": image,
+                    "image_path": str(image_path),
+                    "timestamp": record.get("timestamp"),
+                    "file_name": record.get("file_name"),
+                }
+            )
     except Exception as error:
-        raise RuntimeError(f"Failed to load images from {metadata_file}: {error}")
+        raise RuntimeError(f"Failed to load images from {metadata_file}: {error}") from error
     return images
 
 
-def preprocess_images( images ):
+def preprocess_images(images):
     """Convert OpenCV BGR images to RGB PIL Images as required by the CLIP processor."""
     preprocessed = []
     for record in images:
         bgr = record["image"]
         pil = Image.fromarray(cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB))
-        preprocessed.append({
-            "image": pil,
-            "image_path": record["image_path"],
-            "timestamp": record["timestamp"],
-            "file_name": record["file_name"],
-        })
+        preprocessed.append(
+            {
+                "image": pil,
+                "image_path": record["image_path"],
+                "timestamp": record["timestamp"],
+                "file_name": record["file_name"],
+            }
+        )
     return preprocessed
 
 
-def generate_embeddings( preprocessed_images, processor, model ):
+def generate_embeddings(preprocessed_images, processor, model):
     """
     Run each PIL image through the CLIP image encoder.
     Returns (embeddings_array, mapping) where embeddings_array is shape (N, 512),
@@ -89,16 +93,18 @@ def generate_embeddings( preprocessed_images, processor, model ):
             features = features / features.norm(dim=-1, keepdim=True)
             embeddings.append(features.squeeze(0).cpu().numpy())
 
-            mapping.append({
-                "embedding_index": idx,
-                "image_path": record["image_path"],
-                "timestamp": record["timestamp"],
-                "file_name": record["file_name"],
-            })
+            mapping.append(
+                {
+                    "embedding_index": idx,
+                    "image_path": record["image_path"],
+                    "timestamp": record["timestamp"],
+                    "file_name": record["file_name"],
+                }
+            )
     return np.stack(embeddings, axis=0), mapping
 
 
-def get_already_embedded_paths( mapping_file ):
+def get_already_embedded_paths(mapping_file):
     """Return the set of image paths already present in the embedding mapping."""
     if not Path(mapping_file).exists():
         return set()
@@ -106,7 +112,7 @@ def get_already_embedded_paths( mapping_file ):
         return {entry["image_path"] for entry in json.load(f)}
 
 
-def load_existing_embeddings( embeddings_file, mapping_file ):
+def load_existing_embeddings(embeddings_file, mapping_file):
     """Load existing embeddings array and mapping if both files exist, else return empty."""
     if not Path(embeddings_file).exists() or not Path(mapping_file).exists():
         return None, []
@@ -116,7 +122,7 @@ def load_existing_embeddings( embeddings_file, mapping_file ):
     return arr, mapping
 
 
-def save_embeddings( embeddings_array, mapping ):
+def save_embeddings(embeddings_array, mapping):
     """Write embeddings (.npy) and index-to-metadata mapping (.json) to data/embeddings/."""
     EMBEDDINGS_DIR.mkdir(parents=True, exist_ok=True)
     np.save(str(EMBEDDINGS_FILE), embeddings_array)

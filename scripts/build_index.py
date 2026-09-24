@@ -9,7 +9,7 @@ import numpy as np
 from config import EMBEDDINGS_FILE, INDEX_FILE, MAPPING_FILE
 
 
-def load_embeddings( embeddings_file, mapping_file ):
+def load_embeddings(embeddings_file, mapping_file):
     """Load the embeddings array (.npy) and index-to-metadata mapping (.json) from disk."""
     if not embeddings_file.exists():
         raise FileNotFoundError(f"Embeddings file not found: {embeddings_file}")
@@ -22,7 +22,7 @@ def load_embeddings( embeddings_file, mapping_file ):
     return embeddings_array, mapping
 
 
-def build_faiss_index( embeddings_array ):
+def build_faiss_index(embeddings_array):
     """Build and return a FAISS IndexFlatIP populated with all embeddings.
 
     IndexFlatIP (inner product) is equivalent to cosine similarity when vectors are
@@ -35,13 +35,13 @@ def build_faiss_index( embeddings_array ):
     return index
 
 
-def save_index( index, index_file ):
+def save_index(index, index_file):
     """Write the FAISS index to disk."""
     faiss.write_index(index, str(index_file))
     print(f"Saved FAISS index to {index_file}")
 
 
-def load_index( index_file ):
+def load_index(index_file):
     """Read a FAISS index from disk. Used by query.py at search time."""
     if not index_file.exists():
         raise FileNotFoundError(f"FAISS index not found: {index_file}. Run `main.py index` first.")

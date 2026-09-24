@@ -12,10 +12,12 @@ from scripts.build_index import load_index
 from utils.clip_utils import load_clip_model
 
 
-def load_resources( index_file, mapping_file ):
+def load_resources(index_file, mapping_file):
     """Load the FAISS index and image mapping from disk."""
     if not mapping_file.exists():
-        raise FileNotFoundError(f"Mapping file not found: {mapping_file}. Run `main.py embed` first.")
+        raise FileNotFoundError(
+            f"Mapping file not found: {mapping_file}. Run `main.py embed` first."
+        )
     index = load_index(index_file)
     with open(mapping_file, "r", encoding="utf-8") as f:
         mapping = json.load(f)
@@ -23,7 +25,7 @@ def load_resources( index_file, mapping_file ):
     return index, mapping
 
 
-def embed_query( query_text, processor, model ):
+def embed_query(query_text, processor, model):
     """
     Encode a text query into a CLIP embedding.
     Returns a float32 numpy array of shape (1, 512), L2-normalized so it
@@ -37,28 +39,30 @@ def embed_query( query_text, processor, model ):
     return features.cpu().numpy().astype("float32")
 
 
-def search( index, query_embedding, mapping, top_k ):
+def search(index, query_embedding, mapping, top_k):
     """
     Search the FAISS index for the top_k most similar images.
     Returns a list of dicts: {similarity, image_path, timestamp, file_name}.
     """
     scores, indices = index.search(query_embedding, top_k)
     results = []
-    for score, idx in zip(scores[0], indices[0]):
+    for score, idx in zip(scores[0], indices[0], strict=True):
         if idx == -1:
             continue
         entry = mapping[idx]
-        results.append({
-            "similarity": float(score),
-            "image_path": entry["image_path"],
-            "timestamp": entry["timestamp"],
-            "file_name": entry["file_name"],
-        })
+        results.append(
+            {
+                "similarity": float(score),
+                "image_path": entry["image_path"],
+                "timestamp": entry["timestamp"],
+                "file_name": entry["file_name"],
+            }
+        )
     return results
 
 
-def print_results( query_text, results ):
-    print(f"\nQuery: \"{query_text}\"")
+def print_results(query_text, results):
+    print(f'\nQuery: "{query_text}"')
     print("-" * 40)
     if not results:
         print("No results found.")
@@ -71,9 +75,11 @@ def print_results( query_text, results ):
         print()
 
 
-def main( query_text=None ):
+def main(query_text=None):
     if query_text is None:
-        query_text = " ".join(sys.argv[1:]) if len(sys.argv) > 1 else input("Enter your query: ").strip()
+        query_text = (
+            " ".join(sys.argv[1:]) if len(sys.argv) > 1 else input("Enter your query: ").strip()
+        )
 
     if not query_text:
         print("No query provided. Exiting.")

@@ -32,7 +32,7 @@ def load_moondream():
     return model, tokenizer
 
 
-def answer_question( image_path, question, model, tokenizer ):
+def answer_question(image_path, question, model, tokenizer):
     """Open image_path and ask Moondream2 the given question. Returns the answer string."""
     image_path = Path(image_path)
     if not image_path.exists():

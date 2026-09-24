@@ -7,9 +7,9 @@ BASE_DIR = Path(__file__).resolve().parent
 
 # --- Camera ---
 CAMERA_ID = 0
-CAMERA_SOURCE = "usb"       # "usb" | "csi" — set to "csi" on Jetson with a CSI camera
+CAMERA_SOURCE = "usb"  # "usb" | "csi" — set to "csi" on Jetson with a CSI camera
 CAPTURE_INTERVAL_SECONDS = 10
-MAX_CAPTURES = 5            # increase (or remove cap) for real deployments
+MAX_CAPTURES = 5  # increase (or remove cap) for real deployments
 IMAGE_PREFIX = "frame"
 
 # --- CLIP ---
@@ -24,10 +24,10 @@ TOP_K = 3
 
 # --- Paths ---
 RAW_IMAGE_FOLDER = BASE_DIR / "data" / "raw"
-METADATA_FOLDER  = BASE_DIR / "data" / "metadata"
-METADATA_FILE    = METADATA_FOLDER / "captures.jsonl"
+METADATA_FOLDER = BASE_DIR / "data" / "metadata"
+METADATA_FILE = METADATA_FOLDER / "captures.jsonl"
 
-EMBEDDINGS_DIR  = BASE_DIR / "data" / "embeddings"
+EMBEDDINGS_DIR = BASE_DIR / "data" / "embeddings"
 EMBEDDINGS_FILE = EMBEDDINGS_DIR / "image_embeddings.npy"
-MAPPING_FILE    = EMBEDDINGS_DIR / "image_mapping.json"
-INDEX_FILE      = EMBEDDINGS_DIR / "faiss.index"
+MAPPING_FILE = EMBEDDINGS_DIR / "image_mapping.json"
+INDEX_FILE = EMBEDDINGS_DIR / "faiss.index"
