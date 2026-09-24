@@ -2,17 +2,12 @@
 # All fixtures are designed to avoid real hardware, model downloads, or disk I/O
 # outside of pytest's tmp_path — so the suite runs fast and offline.
 
-import sys
-from pathlib import Path
 from unittest.mock import MagicMock
 
 import faiss
 import numpy as np
 import pytest
 import torch
-
-# Ensure the repo root is importable so `from scripts.x import ...` works in every test
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 
 @pytest.fixture

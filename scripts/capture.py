@@ -2,19 +2,20 @@
 # to data/raw/ with a corresponding metadata entry in data/metadata/captures.jsonl.
 
 import json
-import sys
 import time
 from datetime import datetime
-from pathlib import Path
 
 import cv2
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(BASE_DIR))
-
 from config import (
-    CAMERA_ID, CAMERA_SOURCE, CAPTURE_INTERVAL_SECONDS, MAX_CAPTURES,
-    RAW_IMAGE_FOLDER, METADATA_FOLDER, METADATA_FILE, IMAGE_PREFIX,
+    CAMERA_ID,
+    CAMERA_SOURCE,
+    CAPTURE_INTERVAL_SECONDS,
+    IMAGE_PREFIX,
+    MAX_CAPTURES,
+    METADATA_FILE,
+    METADATA_FOLDER,
+    RAW_IMAGE_FOLDER,
 )
 
 

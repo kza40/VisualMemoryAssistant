@@ -2,6 +2,7 @@
 # Centralised here so the model ID is never duplicated across scripts.
 
 from transformers import CLIPModel, CLIPProcessor
+
 from config import CLIP_MODEL_ID
 
 

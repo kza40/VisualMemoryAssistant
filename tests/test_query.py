@@ -3,7 +3,6 @@ from unittest.mock import MagicMock
 
 import faiss
 import numpy as np
-import pytest
 import torch
 
 

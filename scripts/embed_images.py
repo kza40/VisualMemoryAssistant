@@ -3,7 +3,6 @@
 # Supports incremental embedding — already-embedded images are skipped on subsequent runs.
 
 import json
-import sys
 from pathlib import Path
 
 import cv2
@@ -11,10 +10,7 @@ import numpy as np
 import torch
 from PIL import Image
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(BASE_DIR))
-
-from config import METADATA_FILE, EMBEDDINGS_DIR, EMBEDDINGS_FILE, MAPPING_FILE
+from config import EMBEDDINGS_DIR, EMBEDDINGS_FILE, MAPPING_FILE, METADATA_FILE
 from utils.clip_utils import load_clip_model
 
 

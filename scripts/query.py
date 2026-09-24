@@ -3,18 +3,13 @@
 
 import json
 import sys
-from pathlib import Path
 
-import numpy as np
 import torch
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(BASE_DIR))
-
 from config import INDEX_FILE, MAPPING_FILE, TOP_K
+from models.vlm import answer_question, load_moondream
 from scripts.build_index import load_index
 from utils.clip_utils import load_clip_model
-from models.vlm import answer_question, load_moondream
 
 
 def load_resources( index_file, mapping_file ):
