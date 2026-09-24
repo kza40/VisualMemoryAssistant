@@ -82,6 +82,7 @@ The camera and both models are mocked, so the tests run on any machine without a
 ```bash
 pip install -r requirements.txt
 pytest
+ruff check . && ruff format --check .   # lint, same as CI
 ```
 
 ## Privacy

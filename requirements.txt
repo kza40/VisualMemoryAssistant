@@ -7,3 +7,4 @@ torch
 numpy
 faiss-cpu
 pytest
+ruff

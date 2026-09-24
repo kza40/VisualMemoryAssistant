@@ -16,6 +16,8 @@ jobs:
       - name: Install dependencies
         run: |
           pip install torch --index-url https://download.pytorch.org/whl/cpu
-          pip install opencv-python-headless Pillow transformers numpy faiss-cpu pytest
+          pip install opencv-python-headless Pillow transformers numpy faiss-cpu pytest ruff
+      - name: Lint
+        run: ruff check . && ruff format --check .
       - name: Run tests
         run: pytest -q
