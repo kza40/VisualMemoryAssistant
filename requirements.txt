@@ -1,3 +1,5 @@
+# Development / test dependencies (x86). The target device is the Jetson Orin Nano:
+# see requirements_jetson.txt for the on-device install.
 opencv-python
 Pillow
 transformers

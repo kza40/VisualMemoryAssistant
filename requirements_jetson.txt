@@ -7,10 +7,14 @@
 #           matching your JetPack version):
 #   pip install https://developer.download.nvidia.com/compute/redist/jp/v61/pytorch/torch-2.x.0+nv24.x-cp310-cp310-linux_aarch64.whl
 #
-# Step 2 — install everything else:
+# Step 2 — install OpenCV from JetPack, not pip. The pip wheel is built without
+#           GStreamer, so the CSI camera pipeline in capture.py can't open:
+#   sudo apt install python3-opencv
+#   (create the venv with --system-site-packages so it can see it)
+#
+# Step 3 — install everything else:
 #   pip install -r requirements_jetson.txt
 
-opencv-python
 Pillow
 transformers
 numpy
