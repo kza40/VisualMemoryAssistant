@@ -1,6 +1,6 @@
 # Visual Memory Assistant
 
-[![tests](https://github.com/kza40/VirtualMemoryAssistant/actions/workflows/tests.yml/badge.svg)](https://github.com/kza40/VirtualMemoryAssistant/actions/workflows/tests.yml)
+[![tests](https://github.com/kza40/VisualMemoryAssistant/actions/workflows/tests.yml/badge.svg)](https://github.com/kza40/VisualMemoryAssistant/actions/workflows/tests.yml)
 
 A camera on a Jetson Orin Nano takes a photo every few seconds. Later you can ask it
 something like "where did I leave my keys?" and it finds the most relevant frame and
